@@ -1,9 +1,12 @@
+package Search;
+
+import State.IState;
 import java.util.List;
 
 /**
  * Created by ruben on 02.09.15.
  */
-public interface ISearch<T extends INode>{
+public interface Search<T extends IState>{
     /**
      * The key functunality of every search,
      * performs the algorithm and returns a List which contains
@@ -21,5 +24,8 @@ public interface ISearch<T extends INode>{
      * used in dependency to the size of a single node
      * @return The total amount of memory used during the search
      */
-    int memoryUsed();
+    default long memoryUsed(){
+        Runtime rt = Runtime.getRuntime();
+        return ((rt.totalMemory()-rt.freeMemory())/(8*1024));
+    }
 }
