@@ -9,7 +9,7 @@ import State.IState;
 /**
  * Created by ruben on 02.09.15.
  */
-public class DFS<T extends IState> implements Search<T> {
+public class DFS<T extends IState> implements ISearch<T> {
 
     /**
      * Needed data structures
@@ -19,9 +19,10 @@ public class DFS<T extends IState> implements Search<T> {
     HashMap<T,T> parent = new HashMap<>();
     int nodeSize = 0;
     int movesMaxSize = 0;
+    long timeUsed = 0;
 
     /**
-     * Search.DFS with complete saving of every visited node
+     * ISearch.DFS with complete saving of every visited node
      * which makes it faster, but less memory efficient
      * @param source starting point of the search
      * @param sink node to find
@@ -29,14 +30,15 @@ public class DFS<T extends IState> implements Search<T> {
      */
     @Override
     public List<T> search(T source, T sink) {
-
+        long startingTime = System.currentTimeMillis();
+        nodeSize = source.memoryUsed();
         //Get node size for memory used
         nodeSize = source.memoryUsed();
-        // init Search.DFS
+        // init ISearch.DFS
         border.push(source);
         parent.put(source,null);
 
-        //Iterative Search.DFS
+        //Iterative ISearch.DFS
         while (!border.isEmpty()){
 
             //Get next element from border
@@ -57,6 +59,7 @@ public class DFS<T extends IState> implements Search<T> {
                         result.addFirst(current);
                         current = parent.get(current);
                     }
+                    timeUsed =  System.currentTimeMillis() - startingTime;
                     return result;
                 }
 
@@ -68,7 +71,17 @@ public class DFS<T extends IState> implements Search<T> {
             }
         }
 
+        timeUsed = (System.currentTimeMillis() - startingTime);
         //If all states are visited and sink isn't found return null to signal failure
         return null;
     }
+
+    public long memoryUsed(){
+        return border.size()*nodeSize + movesMaxSize*(nodeSize + 64) + parent.size()*nodeSize*2;
+    }
+
+    public long timeUsed(){
+        return timeUsed;
+    }
+
 }

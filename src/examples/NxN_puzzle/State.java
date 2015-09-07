@@ -1,9 +1,7 @@
 package examples.NxN_puzzle;
 
-import State.IState;
-
 import java.util.*;
-
+import State.IState;
 /**
  * Created by ruben on 06.09.15.
  */
@@ -16,6 +14,7 @@ public class State extends IState {
         State validState;
         while (!((validState = new State(rows, false)).isSolvable())) {
         }
+        validState.printState();
         return validState;
     }
 
@@ -24,7 +23,6 @@ public class State extends IState {
     }
 
     private State(int rows, boolean goal) {
-
 
         //Generate numbers from 0 to rows^2
         LinkedList<Integer> randomOrder = new LinkedList<>();
@@ -75,7 +73,6 @@ public class State extends IState {
                 }
             }
         }
-        printState();
         if(state.length % 2 == 1) {
             return (numSwaps % 2 == 0);
         }
@@ -105,10 +102,10 @@ public class State extends IState {
         String printState = "[ ";
         for (int i = 0; i < state.length; i++) {
             for (int j = 0; j < state.length; j++) {
-                printState += Integer.toString(state[i][j]);
+                printState += Integer.toString(state[i][j]) + " ";
             }
         }
-        printState += " ]";
+        printState += "]";
         return printState;
     }
 
@@ -119,7 +116,7 @@ public class State extends IState {
     }
 
     @Override
-    public HashMap<State, Double> possibleMoves() {
+    public HashMap<IState, Double> possibleMoves() {
         //Get position of empty tile
         int zeroRow = 0;
         int zeroColumn = 0;
@@ -133,10 +130,8 @@ public class State extends IState {
             }
         }
 
-        if(debug)System.out.println("Rows: " + zeroRow + "\tColumns: " + zeroColumn);
-
         //Create list with possible moves
-        HashMap<State,Double> possibleMoves= new HashMap<>();
+        HashMap<IState,Double> possibleMoves= new HashMap<>();
 
         //Check if tile to the left of empty is valid
         if(zeroColumn > 0){

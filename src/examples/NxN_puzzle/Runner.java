@@ -6,12 +6,18 @@ import Search.*;
  */
 public class Runner {
     public static void main(String[] args){
-        Runtime rt = Runtime.getRuntime();
-        System.out.println("Memory used before search: " + ((rt.totalMemory()-rt.freeMemory())/(8*1024)) + " MB");
         DFS<State> dfs = new DFS<State>();
-        System.out.println(dfs.search(State.getValidState(3), State.getGoalState(3)));
-        System.out.println("Memory used during search: " + dfs.memoryUsed() + " MB");
+        State start = State.getValidState(3);
+        System.out.println("DFS: ");
+        System.out.println("Length of solution: " + dfs.search(start, State.getGoalState(3)).size());
+        System.out.println("Memory used: " + dfs.memoryUsed()/(8*1024) + " MB");
+        System.out.println("Time used: " + dfs.timeUsed() + " ms");
+
         dfs = null;
-        System.gc();
+        DepthLimitedDFS<State> dlDFS = new DepthLimitedDFS<State>();
+        System.out.println("\nDepth limited DFS: ");
+        System.out.println("Length of solution: " + dlDFS.search(start, State.getGoalState(3),40).size());
+        System.out.println("Memory used: " + dlDFS.memoryUsed()/(8*1024) + " MB");
+        System.out.println("Time used: " + dlDFS.timeUsed() + " ms");
     }
 }

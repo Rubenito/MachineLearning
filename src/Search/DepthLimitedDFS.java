@@ -2,74 +2,89 @@ package Search;
 
 import State.IState;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created by ruben on 06.09.15.
  */
-public class DepthLimitedDFS<T extends IState> implements Search<T> {
+public class DepthLimitedDFS<T extends IState> implements ISearch<T> {
 
     /**
      * Needed data structures
      */
-    LinkedList<T> result = new LinkedList<>();
-    Stack<T> border = new Stack<>();
+    HashSet<T> visited = new HashSet<>();
     HashMap<T,T> parent = new HashMap<>();
     int nodeSize = 0;
     int movesMaxSize = 0;
-
+    int visitedMaxSize = 0;
+    long timeUsed = 0;
     /**
-     * Search.DFS with complete saving of every visited node
+     * ISearch.DFS with complete saving of every visited node
      * which makes it faster, but less memory efficient
      * @param source starting point of the search
      * @param sink node to find
      * @return List which holds a valid sequence from source to sink
      */
     @Override
-    public List<T> search(T source, T sink) {
-
-        //Get node size for memory used
+    public List<T> search(T source, T sink, int limit) {
+        long startingTime = System.currentTimeMillis();
         nodeSize = source.memoryUsed();
-        // init Search.DFS
-        border.push(source);
-        parent.put(source,null);
-
-        //Iterative Search.DFS
-        while (!border.isEmpty()){
-
-            //Get next element from border
-            T current = border.pop();
-            //Check for possible moves & update movesMaxSize for memory used
-            HashMap<T,Double> moves = (HashMap<T,Double>) current.possibleMoves();
-            if(moves.size() > movesMaxSize){
-                movesMaxSize = moves.size();
+        LinkedList<T> result = null;
+        if(rekursiveSearch(source,sink,limit)){
+            T current = sink;
+            result = new LinkedList<>();
+            parent.put(source,null);
+            while(current != null){
+                result.addFirst(current);
+                current = parent.get(current);
             }
+        }
+        timeUsed = (System.currentTimeMillis() - startingTime);
+        return result;
+    }
 
-            //For every possible move check
-            for(T move : moves.keySet()){
+    public boolean rekursiveSearch(T source, T sink, int limit){
 
-                //If sink stop search and return result list
-                if(move.equals(sink)) {
-                    result.add(move);
-                    while(current != null){
-                        result.addFirst(current);
-                        current = parent.get(current);
-                    }
-                    return result;
-                }
+        boolean result;
 
-                //Else if not yet visited add move to border
-                else if (!parent.containsKey(move)) {
-                    parent.put(move, current);
-                    border.push(move);
+        //See if limit is reached
+        if(limit==0){
+            return false;
+        }
+
+        //See if element is found
+        if(source.equals(sink)){
+            return true;
+        }
+
+        //If not call depth-limited-search recursively
+        visited.add(source);
+        if(visited.size() > visitedMaxSize){
+            visitedMaxSize = visited.size();
+        }
+        HashMap<T,Double> moves = (HashMap<T,Double>)source.possibleMoves();
+        if(moves.size() > movesMaxSize){
+            movesMaxSize = moves.size();
+        }
+        for(T move : moves.keySet()){
+            if(!visited.contains(move)) {
+                result = rekursiveSearch(move, sink, limit - 1);
+                //If one rekursive call returns non null, we found the sink
+                if (result) {
+                    parent.put(move,source);
+                    return true;
                 }
             }
         }
+        visited.remove(source);
+        return false;
+    }
 
-        //If all states are visited and sink isn't found return null to signal failure
-        return null;
+    public long memoryUsed(){
+        return visitedMaxSize*nodeSize + movesMaxSize*(nodeSize + 64) + parent.size()*nodeSize;
+    }
+
+    public long timeUsed(){
+        return timeUsed;
     }
 }

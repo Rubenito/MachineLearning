@@ -1,6 +1,5 @@
 package State;
 
-import examples.NxN_puzzle.State;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.HashMap;
@@ -46,9 +45,10 @@ public abstract class IState {
     }
 
 
+
     /**
      * A method that returns every possible move from this state
      * @return A list with every possible move
      */
-    public abstract HashMap<State, Double> possibleMoves();
+    public abstract HashMap<IState, Double> possibleMoves();
 }
